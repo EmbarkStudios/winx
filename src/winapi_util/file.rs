@@ -7,12 +7,11 @@ use std::io;
 use std::mem;
 use std::os::windows::io::AsRawHandle;
 
-use io_lifetimes::AsHandle;
-use windows_sys::Win32::Foundation::HANDLE;
-use windows_sys::Win32::Foundation::{GetLastError, FILETIME, NO_ERROR};
-use windows_sys::Win32::Storage::FileSystem::{
-    GetFileInformationByHandle, GetFileType, BY_HANDLE_FILE_INFORMATION, FILE_ATTRIBUTE_HIDDEN,
+use crate::bindings::{
+    self, GetFileInformationByHandle, GetFileType, GetLastError, BY_HANDLE_FILE_INFORMATION,
+    FILETIME, FILE_ATTRIBUTE_HIDDEN, HANDLE, NO_ERROR,
 };
+use io_lifetimes::AsHandle;
 
 /// Return various pieces of information about a file.
 ///
@@ -139,25 +138,25 @@ impl Type {
     /// Returns true if this type represents a character file, which is
     /// typically an LPT device or a console.
     pub fn is_char(&self) -> bool {
-        self.0 == ::windows_sys::Win32::Storage::FileSystem::FILE_TYPE_CHAR
+        self.0 == bindings::FILE_TYPE_CHAR
     }
 
     /// Returns true if this type represents a disk file.
     pub fn is_disk(&self) -> bool {
-        self.0 == ::windows_sys::Win32::Storage::FileSystem::FILE_TYPE_DISK
+        self.0 == bindings::FILE_TYPE_DISK
     }
 
     /// Returns true if this type represents a sock, named pipe or an
     /// anonymous pipe.
     pub fn is_pipe(&self) -> bool {
-        self.0 == ::windows_sys::Win32::Storage::FileSystem::FILE_TYPE_PIPE
+        self.0 == bindings::FILE_TYPE_PIPE
     }
 
     /// Returns true if this type is not known.
     ///
     /// Note that this never corresponds to a failure.
     pub fn is_unknown(&self) -> bool {
-        self.0 == ::windows_sys::Win32::Storage::FileSystem::FILE_TYPE_UNKNOWN
+        self.0 == bindings::FILE_TYPE_UNKNOWN
     }
 }
 

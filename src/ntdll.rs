@@ -3,13 +3,11 @@
 
 #![allow(nonstandard_style)]
 
+use crate::bindings::{GetModuleHandleA, GetProcAddress, IO_STATUS_BLOCK, NTSTATUS};
 use io_lifetimes::BorrowedHandle;
 use std::ffi::c_void;
 use std::os::raw::c_ulong;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use windows_sys::Win32::Foundation::NTSTATUS;
-use windows_sys::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
-use windows_sys::Win32::System::WindowsProgramming::IO_STATUS_BLOCK;
 
 // https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/access-mask
 type ACCESS_MASK = u32;

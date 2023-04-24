@@ -1,9 +1,13 @@
 #![allow(non_camel_case_types)]
 
-use crate::cvt::cvt;
-use crate::ntdll::{
-    NtQueryInformationFile, FILE_ACCESS_INFORMATION, FILE_INFORMATION_CLASS, FILE_MODE_INFORMATION,
+use crate::bindings::{
+    DeviceIoControl, GetFinalPathNameByHandleW, GetFullPathNameW, ReOpenFile,
+    RtlNtStatusToDosError, ERROR_BUFFER_OVERFLOW, FILE_ACCESS_INFORMATION, FILE_INFORMATION_CLASS,
+    FILE_MODE_INFORMATION, FSCTL_GET_REPARSE_POINT, HANDLE, INVALID_HANDLE_VALUE, IO_STATUS_BLOCK,
+    STATUS_SUCCESS,
 };
+use crate::cvt::cvt;
+use crate::ntdll::NtQueryInformationFile;
 use bitflags::bitflags;
 use io_lifetimes::BorrowedHandle;
 use std::ffi::{c_void, OsString};
@@ -12,17 +16,6 @@ use std::os::windows::ffi::OsStringExt;
 use std::os::windows::io::{AsRawHandle, FromRawHandle, RawHandle};
 use std::path::{Path, PathBuf};
 use std::{io, mem, ptr, slice};
-use windows_sys::Win32::Foundation::{
-    self, RtlNtStatusToDosError, ERROR_BUFFER_OVERFLOW, HANDLE, INVALID_HANDLE_VALUE,
-    STATUS_SUCCESS,
-};
-use windows_sys::Win32::Storage::FileSystem::{self, GetFinalPathNameByHandleW, GetFullPathNameW};
-use windows_sys::Win32::System::Ioctl::FSCTL_GET_REPARSE_POINT;
-use windows_sys::Win32::System::SystemServices::{
-    self, IO_REPARSE_TAG_MOUNT_POINT, IO_REPARSE_TAG_SYMLINK,
-};
-use windows_sys::Win32::System::WindowsProgramming::IO_STATUS_BLOCK;
-use windows_sys::Win32::System::IO::DeviceIoControl;
 
 /// Maximum total path length for Unicode in Windows.
 /// [Maximum path length limitation]: https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#maximum-path-length-limitation
@@ -336,7 +329,7 @@ pub fn reopen_file(
     // default (see OpenOptions in stdlib) This keeps the same share mode when
     // reopening the file handle
     let new_handle = unsafe {
-        FileSystem::ReOpenFile(
+        ReOpenFile(
             handle.as_raw_handle() as HANDLE,
             access_mode.bits(),
             share_mode.bits(),

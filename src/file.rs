@@ -1,13 +1,15 @@
 #![allow(non_camel_case_types)]
 
 use crate::bindings::{
-    DeviceIoControl, GetFinalPathNameByHandleW, GetFullPathNameW, ReOpenFile,
-    RtlNtStatusToDosError, ERROR_BUFFER_OVERFLOW, FILE_ACCESS_INFORMATION, FILE_INFORMATION_CLASS,
-    FILE_MODE_INFORMATION, FSCTL_GET_REPARSE_POINT, HANDLE, INVALID_HANDLE_VALUE, IO_STATUS_BLOCK,
-    STATUS_SUCCESS,
+    self as FileSystem, self as SystemServices, self as Foundation, DeviceIoControl,
+    GetFinalPathNameByHandleW, GetFullPathNameW, ReOpenFile, RtlNtStatusToDosError,
+    ERROR_BUFFER_OVERFLOW, FSCTL_GET_REPARSE_POINT, HANDLE, INVALID_HANDLE_VALUE,
+    IO_REPARSE_TAG_MOUNT_POINT, IO_REPARSE_TAG_SYMLINK, IO_STATUS_BLOCK, STATUS_SUCCESS,
 };
 use crate::cvt::cvt;
-use crate::ntdll::NtQueryInformationFile;
+use crate::ntdll::{
+    NtQueryInformationFile, FILE_ACCESS_INFORMATION, FILE_INFORMATION_CLASS, FILE_MODE_INFORMATION,
+};
 use bitflags::bitflags;
 use io_lifetimes::BorrowedHandle;
 use std::ffi::{c_void, OsString};
